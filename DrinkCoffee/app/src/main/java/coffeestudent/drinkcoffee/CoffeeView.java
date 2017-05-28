@@ -1,6 +1,7 @@
 package coffeestudent.drinkcoffee;
 
 import android.content.Context;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
 
@@ -11,6 +12,9 @@ import android.view.SurfaceHolder;
 public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
     public CoffeeView(Context context) {
         super(context);
+        getHolder().addCallback(this);
+        setFocusable(true);
+        System.out.println("CoffeeView constructor");
     }
 
     @Override
@@ -26,5 +30,10 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
 
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return true;
     }
 }
