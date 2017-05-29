@@ -1,5 +1,9 @@
 package coffeestudent.drinkcoffee.BodyParts;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+
 /**
  * Created by Steven on 5/28/2017.
  */
@@ -9,6 +13,8 @@ public abstract class Arm {
     private int [] joint1;
     private int [] joint2;
     private double length;
+    private Bitmap bitmap;
+    private int [] dimensions;
 
     public Arm(){
 
@@ -17,6 +23,7 @@ public abstract class Arm {
     public Arm(int x1, int y1, int x2, int y2){
         joint1 = new int[2];
         joint2 = new int[2];
+        dimensions = new int [2];
         joint1[0] = x1;
         joint1[1] = y1;
         joint2[0] = x2;
@@ -27,11 +34,17 @@ public abstract class Arm {
     public Arm(int x1, int y1, int x2, int y2, double length){
         joint1 = new int[2];
         joint2 = new int[2];
+        dimensions = new int [2];
         joint1[0] = x1;
         joint1[1] = y1;
         joint2[0] = x2;
         joint2[1] = y2;
         this.length = length;
+    }
+
+    public void setDimensions(int x, int y){
+        dimensions[0] = x;
+        dimensions[1] = y;
     }
 
 
@@ -63,6 +76,39 @@ public abstract class Arm {
 
     public double getLength(){
         return length;
+    }
+
+    protected void setBitmap(Bitmap bitmap){
+        this.bitmap = bitmap;
+
+    }
+
+    public void draw(Canvas canvas){
+        double theta = Math.atan2((joint1[0]-joint2[0]),(joint2[1]-joint1[1]));
+
+        //calculate new coord to draw on rotated canvas
+        double r1 = Math.sqrt((joint1[0])*joint1[0] + joint1[1]*joint1[1]);
+        double newAlpha1 = Math.atan2(joint1[1],joint1[0]) - theta;
+        int x1 = (int) Math.round(r1*Math.cos(newAlpha1));
+        int y1 = (int) Math.round(r1*Math.sin(newAlpha1));
+
+        double r2 = Math.sqrt(joint2[0]*joint2[0] + joint2[1]*joint2[1]);
+        double newAlpha2 = Math.atan2(joint2[1],joint2[0]);
+        int x2 = (int) Math.round(r2*Math.cos(newAlpha2));
+        int y2 = (int) Math.round(r2*Math.sin(newAlpha2));
+
+        assert(x1==x2);
+
+        int coordLeft = x1-dimensions[0]/2;
+        int coordRight = x1+dimensions[0]/2;
+        int coordTop = (y1+y2)/2 - dimensions[1]/2;
+        int coordBottom = (y1+y2)/2 + dimensions[1]/2;
+        Rect rect = new Rect(coordLeft,coordTop,coordRight,coordBottom);
+
+        canvas.save();
+        canvas.rotate((float)theta);
+        canvas.drawBitmap(bitmap, null, rect, null);
+        canvas.restore();
     }
 
     public static int [] setElbow(UpperArm upperArm, Forearm foreArm){

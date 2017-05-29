@@ -1,6 +1,13 @@
 package coffeestudent.drinkcoffee;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.SurfaceHolder;
@@ -22,6 +29,25 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         coffeeGame = new CoffeeGame(getWidth(),getHeight());
+        setWillNotDraw(false);
+    }
+
+    @Override
+    public void onDraw(Canvas canvas) {
+        System.out.println("ondraw");
+        canvas.drawColor(Color.CYAN);
+        Path path = new Path();
+
+        path.moveTo(getWidth()/2-1,getHeight()/4);
+        path.lineTo(getWidth()*3/4,getHeight()/2);
+        path.lineTo(getWidth()/2-1,getHeight()*3/4);
+        path.lineTo(getWidth()/4,getHeight()/2);
+        path.lineTo(getWidth()/2-1,getHeight()/4);
+
+        Paint p = new Paint();
+        p.setColor(Color.RED);
+        canvas.drawPath(path,p);
+
     }
 
     @Override
