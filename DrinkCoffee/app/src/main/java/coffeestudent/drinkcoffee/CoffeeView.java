@@ -10,6 +10,8 @@ import android.view.SurfaceHolder;
  */
 
 public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
+    private CoffeeGame coffeeGame;
+
     public CoffeeView(Context context) {
         super(context);
         getHolder().addCallback(this);
@@ -19,7 +21,7 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
+        coffeeGame = new CoffeeGame(getWidth(),getHeight());
     }
 
     @Override
