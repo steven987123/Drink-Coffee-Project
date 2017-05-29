@@ -81,6 +81,12 @@ public abstract class Arm {
         if (distanceBWCoords < M+L && distanceBWCoords > Math.abs(M-L)){
             ij = setElbowAcceptableCoords(a,b,x,y,M,L);
         }
+        else{
+            i = M * (y-b)/Math.sqrt((b-y)*(b-y) + (a-x)*(a-x)) + a;
+            j = M * (x-a)/Math.sqrt((b-y)*(b-y) + (a-x)*(a-x)) + b;
+            ij[0] = (int) Math.round(i);
+            ij[1] = (int) Math.round(j);
+        }
 
         upperArm.setJoint2(ij[0],ij[1]);
         foreArm.setJoint1(ij[0],ij[1]);

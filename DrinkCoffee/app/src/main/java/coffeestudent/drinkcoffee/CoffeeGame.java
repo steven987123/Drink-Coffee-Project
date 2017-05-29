@@ -20,5 +20,7 @@ public class CoffeeGame {
         upperArm = new UpperArm(8,2,6,6);
         forearm = new Forearm(6,6,0,4);
         Arm.setElbow(upperArm,forearm);
+        forearm.setJoint2(4,4);
+        Arm.setElbow(upperArm,forearm);
     }
 }
