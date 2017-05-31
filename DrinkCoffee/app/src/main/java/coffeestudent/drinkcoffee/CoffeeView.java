@@ -58,7 +58,7 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-
+        System.out.println("Bye");
     }
 
     @Override
