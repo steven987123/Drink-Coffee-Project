@@ -34,19 +34,20 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void onDraw(Canvas canvas) {
-        System.out.println("ondraw");
+        //System.out.println("ondraw");
         canvas.drawColor(Color.CYAN);
-        Path path = new Path();
-
-        path.moveTo(getWidth()/2-1,getHeight()/4);
-        path.lineTo(getWidth()*3/4,getHeight()/2);
-        path.lineTo(getWidth()/2-1,getHeight()*3/4);
-        path.lineTo(getWidth()/4,getHeight()/2);
-        path.lineTo(getWidth()/2-1,getHeight()/4);
-
-        Paint p = new Paint();
-        p.setColor(Color.RED);
-        canvas.drawPath(path,p);
+//        Path path = new Path();
+//
+//        path.moveTo(getWidth()/2-1,getHeight()/4);
+//        path.lineTo(getWidth()*3/4,getHeight()/2);
+//        path.lineTo(getWidth()/2-1,getHeight()*3/4);
+//        path.lineTo(getWidth()/4,getHeight()/2);
+//        path.lineTo(getWidth()/2-1,getHeight()/4);
+//
+//        Paint p = new Paint();
+//        p.setColor(Color.RED);
+//        canvas.drawPath(path,p);
+        coffeeGame.drawArm(canvas);
 
     }
 
@@ -62,6 +63,14 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        //System.out.println("touch event");
+        if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE){
+            //System.out.println("action down");
+            coffeeGame.setHandPoint(Math.round(event.getX()),Math.round(event.getY()));
+            //return false;
+            coffeeGame.updateArm();
+            invalidate();
+        }
         return true;
     }
 }
