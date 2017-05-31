@@ -2,6 +2,8 @@ package coffeestudent.drinkcoffee.BodyParts;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 
 /**
@@ -93,7 +95,7 @@ public abstract class Arm {
         int y1 = (int) Math.round(r1*Math.sin(newAlpha1));
 
         double r2 = Math.sqrt(joint2[0]*joint2[0] + joint2[1]*joint2[1]);
-        double newAlpha2 = Math.atan2(joint2[1],joint2[0]);
+        double newAlpha2 = Math.atan2(joint2[1],joint2[0])-theta;
         int x2 = (int) Math.round(r2*Math.cos(newAlpha2));
         int y2 = (int) Math.round(r2*Math.sin(newAlpha2));
 
@@ -101,13 +103,17 @@ public abstract class Arm {
 
         int coordLeft = x1-dimensions[0]/2;
         int coordRight = x1+dimensions[0]/2;
-        int coordTop = (y1+y2)/2 - dimensions[1]/2;
-        int coordBottom = (y1+y2)/2 + dimensions[1]/2;
+        int coordTop = y1-dimensions[1]/2;
+        int coordBottom = y2+dimensions[1]/2;
         Rect rect = new Rect(coordLeft,coordTop,coordRight,coordBottom);
 
+
         canvas.save();
-        canvas.rotate((float)theta);
-        canvas.drawBitmap(bitmap, null, rect, null);
+        canvas.rotate((float)(theta*180/Math.PI));
+        //canvas.drawBitmap(bitmap, null, rect, null);
+        Paint p = new Paint();
+        p.setColor(Color.BLUE);
+        canvas.drawRect(rect, p);
         canvas.restore();
     }
 
@@ -128,10 +134,21 @@ public abstract class Arm {
             ij = setElbowAcceptableCoords(a,b,x,y,M,L);
         }
         else{
-            i = M * (y-b)/Math.sqrt((b-y)*(b-y) + (a-x)*(a-x)) + a;
-            j = M * (x-a)/Math.sqrt((b-y)*(b-y) + (a-x)*(a-x)) + b;
+            //(i,j) is in same direction as (x,y) from (a,b)
+            i = M * (x-a)/Math.sqrt((b-y)*(b-y) + (a-x)*(a-x)) + a;
+            j = M * (y-b)/Math.sqrt((b-y)*(b-y) + (a-x)*(a-x)) + b;
             ij[0] = (int) Math.round(i);
             ij[1] = (int) Math.round(j);
+            //keep forearm length
+            if (distanceBWCoords > Math.abs(M-L)){
+                x = (M+L)/M*(i-a)+a;
+                y = (M+L)/M*(j-b)+b;
+            }
+            else {
+                x = (M - L) / M * (i - a) + a;
+                y = (M-L)/M * (j-b) + b;
+            }
+            foreArm.setJoint2((int)Math.round(x),(int)Math.round(y));
         }
 
         upperArm.setJoint2(ij[0],ij[1]);
@@ -154,8 +171,13 @@ public abstract class Arm {
                 4*b*y*(L*L+M*M-x*x-y*y) - 4*a*x*(b*b-L*L-M*M+x*x-2*b*y+y*y) +
                 2*a*a*(b*b-L*L-M*M+3*x*x-2*b*y+y*y));
         double denom = 2*(a*a + b*b -2*a*x + x*x - 2*b*y + y*y);
-        i = (num1 + Math.sqrt(num2)) / denom;
+        if (y>b)
+            i = (num1 + Math.sqrt(num2)) / denom;
+        else
+            i = (num1 - Math.sqrt(num2)) / denom;
 
+        if (b-y == 0)
+            y = b+0.0001;//prevents 1/0
         num1 = a*a*b*b + Math.pow(b,4) + b*b*L*L - b*b*M*M - 2*a*b*b*x + b*b*x*x - 2*b*b*b*y -
                 2*b*L*L*y + 2*b*M*M*y - a*a*y*y + L*L*y*y - M*M*y*y + 2*a*x*y*y -
                 x*x*y*y + 2*b*y*y*y - Math.pow(y,4);
@@ -171,7 +193,11 @@ public abstract class Arm {
                 4*b*y*(L*L + M*M - x*x - y*y) - 4*a*x*(b*b - L*L - M*M + x*x - 2*b*y + y*y) +
                 2*a*a*(b*b - L*L - M*M + 3*x*x - 2*b*y + y*y)));
         denom = 2*(b - y)*(a*a + b*b - 2*a*x + x*x - 2*b*y + y*y);
-        j = (num1-a*Math.sqrt(num2) + x*Math.sqrt(num3))/denom;
+
+        if (y>b)
+            j = (num1 - a*Math.sqrt(num2) + x*Math.sqrt(num3))/denom;
+        else
+            j = (num1 + a*Math.sqrt(num2) - x*Math.sqrt(num3))/denom;
 
         ij[0] = (int) Math.round(i);
         ij[1] = (int) Math.round(j);
