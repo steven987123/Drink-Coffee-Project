@@ -1,6 +1,7 @@
 package coffeestudent.drinkcoffee;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -18,37 +19,30 @@ import android.view.SurfaceHolder;
 
 public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
     private CoffeeGame coffeeGame;
+    private final Context context;
 
     public CoffeeView(Context context) {
         super(context);
         getHolder().addCallback(this);
         setFocusable(true);
+        this.context = context;
         System.out.println("CoffeeView constructor");
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        coffeeGame = new CoffeeGame(getWidth(),getHeight());
         setWillNotDraw(false);
+        coffeeGame = new CoffeeGame(context, getWidth(),getHeight());
+        coffeeGame.startSoundtrack();
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         //System.out.println("ondraw");
         canvas.drawColor(Color.CYAN);
-//        Path path = new Path();
-//
-//        path.moveTo(getWidth()/2-1,getHeight()/4);
-//        path.lineTo(getWidth()*3/4,getHeight()/2);
-//        path.lineTo(getWidth()/2-1,getHeight()*3/4);
-//        path.lineTo(getWidth()/4,getHeight()/2);
-//        path.lineTo(getWidth()/2-1,getHeight()/4);
-//
-//        Paint p = new Paint();
-//        p.setColor(Color.RED);
-//        canvas.drawPath(path,p);
+        coffeeGame.drawBG(this, canvas);
         coffeeGame.drawArm(canvas);
-
+        coffeeGame.drawHand(canvas);
     }
 
     @Override
@@ -58,6 +52,8 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        coffeeGame.stopAllSoundtrack(); //important to stop playing soundtrack after
+                                        //user exits
         System.out.println("Bye");
     }
 
@@ -72,5 +68,40 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
             invalidate();
         }
         return true;
+    }
+
+    public static void setRectWithDefaultRatioWithPixelCoord(Rect rect, Bitmap icon,
+                                                             int pixelCoordx, int pixelCoordy,
+                                                             int rowSize, int colSize){
+        int centerx, centery;
+        int coordLeft, coordTop, coordRight, coordBottom;
+        float rectAspectRatio, iconAspectRatio;
+
+        rectAspectRatio = colSize/((float) rowSize);
+        iconAspectRatio = icon.getHeight()/((float) icon.getWidth());
+
+        centerx = (2*pixelCoordx+rowSize)/2;
+        centery = (2*pixelCoordy+colSize)/2;
+
+        if (rectAspectRatio < iconAspectRatio) {
+            coordLeft = (int) (centerx - colSize / iconAspectRatio /2);
+            coordRight = (int) (centerx + colSize / iconAspectRatio /2);
+            coordTop = pixelCoordy;
+            coordBottom = pixelCoordy+colSize;
+        }
+        else if (rectAspectRatio > iconAspectRatio) {
+            coordTop = (int) (centery - rowSize*iconAspectRatio/2.0);
+            coordBottom = (int) (centery + rowSize*iconAspectRatio/2.0);
+            coordLeft = pixelCoordx;
+            coordRight = pixelCoordx+rowSize;
+        }
+        else {
+            coordLeft = pixelCoordx;
+            coordRight = pixelCoordx+rowSize;
+            coordTop = pixelCoordy;
+            coordBottom = pixelCoordy+colSize;
+        }
+
+        rect.set(coordLeft, coordTop, coordRight, coordBottom);
     }
 }

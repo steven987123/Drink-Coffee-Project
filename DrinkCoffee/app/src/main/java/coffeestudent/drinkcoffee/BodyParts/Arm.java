@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 
 /**
  * Created by Steven on 5/28/2017.
@@ -47,6 +48,10 @@ public abstract class Arm {
     public void setDimensions(int x, int y){
         dimensions[0] = x;
         dimensions[1] = y;
+    }
+
+    public void setLength(int length){
+        this.length = length;
     }
 
 
@@ -107,13 +112,20 @@ public abstract class Arm {
         int coordBottom = y2+dimensions[1]/2;
         Rect rect = new Rect(coordLeft,coordTop,coordRight,coordBottom);
 
-
+        //begin rotating
         canvas.save();
         canvas.rotate((float)(theta*180/Math.PI));
         //canvas.drawBitmap(bitmap, null, rect, null);
         Paint p = new Paint();
         p.setColor(Color.BLUE);
-        canvas.drawRect(rect, p);
+        //canvas.drawRect(rect, p);
+        canvas.drawRoundRect(new RectF(rect), canvas.getWidth()/24, canvas.getWidth()/24, p);
+
+        Paint sp = new Paint();
+        sp.setStyle(Paint.Style.STROKE);
+        sp.setStrokeWidth(10);
+        sp.setColor(Color.BLACK);
+        canvas.drawRoundRect(new RectF(rect),canvas.getWidth()/24, canvas.getWidth()/24,sp);
         canvas.restore();
     }
 
