@@ -21,10 +21,12 @@ import coffeestudent.drinkcoffee.BodyParts.UpperArm;
 public class CoffeeGame {
     private final int SCREENWIDTH;
     private final int SCREENHEIGHT;
-    private UpperArm upperArm;
-    private Forearm forearm;
+    private final UpperArm upperArm;
+    private final Forearm forearm;
     private int [] point;
     private CoffeeSounds coffeeSounds;
+
+    private boolean gameIsRunning = true;
 
 
     public CoffeeGame(Context context, int screenwidth, int screenheight){
@@ -49,13 +51,29 @@ public class CoffeeGame {
     }
 
     public void updateArm(){
-        forearm.setJoint2(point[0],point[1]);
-        Arm.setElbow(upperArm,forearm);
+        synchronized (forearm){
+            synchronized (upperArm) {
+                forearm.setJoint2(point[0], point[1]);
+                Arm.setElbow(upperArm, forearm);
+            }
+        }
     }
 
     public void drawArm(Canvas canvas){
         upperArm.draw(canvas);
         forearm.draw(canvas);
+    }
+
+    public void draw(CoffeeView view, Canvas canvas){
+        canvas.drawColor(Color.CYAN);
+        drawBG(view, canvas);
+        synchronized (forearm){
+            synchronized (upperArm){
+                drawArm(canvas);
+                drawCoffeeCup(view, canvas);
+                drawHand(canvas);
+            }
+        }
     }
 
     public void drawBG(SurfaceView view, Canvas canvas){
@@ -114,11 +132,39 @@ public class CoffeeGame {
         canvas.drawCircle(forearm.getJoint2()[0], forearm.getJoint2()[1], canvas.getWidth()/20, sp);
     }
 
+    public void drawCoffeeCup(CoffeeView view, Canvas canvas){
+        Bitmap bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeecup);
+        int coordx = forearm.getJoint2()[0] - canvas.getWidth()/5;
+        int coordy = forearm.getJoint2()[1] - canvas.getHeight()/10;
+        Rect rect = new Rect();
+        CoffeeView.setRectWithDefaultRatioWithPixelCoord(rect, bitmap, coordx, coordy,
+                canvas.getWidth()/5, canvas.getHeight()/5);
+        float angle = (float) (Math.pow(1.0*(coordx-1.0/canvas.getWidth()*10),3)/
+                Math.pow(canvas.getWidth()*6/10,3)*90);
+        canvas.save();
+        canvas.rotate(angle, forearm.getJoint2()[0], forearm.getJoint2()[1]);
+        canvas.drawBitmap(bitmap, null, rect, null);
+        canvas.restore();
+
+    }
+
     public void startSoundtrack(){
         coffeeSounds.playSoundtrack();
     }
 
     public void stopAllSoundtrack(){
         coffeeSounds.stopAndReleaseAll();
+    }
+
+    public boolean isGameRunning(){
+        return gameIsRunning;
+    }
+
+    public boolean setGameIsOver(){
+        return setGameIsOver(true);
+    }
+    public boolean setGameIsOver(boolean b){
+        gameIsRunning = !b;
+        return gameIsRunning;
     }
 }

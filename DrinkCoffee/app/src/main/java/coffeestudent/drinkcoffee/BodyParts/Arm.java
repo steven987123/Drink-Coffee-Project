@@ -104,7 +104,7 @@ public abstract class Arm {
         int x2 = (int) Math.round(r2*Math.cos(newAlpha2));
         int y2 = (int) Math.round(r2*Math.sin(newAlpha2));
 
-        assert(x1==x2);
+        //assert(x1==x2);
 
         int coordLeft = x1-dimensions[0]/2;
         int coordRight = x1+dimensions[0]/2;

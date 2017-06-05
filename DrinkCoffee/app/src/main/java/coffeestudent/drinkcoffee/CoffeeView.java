@@ -31,18 +31,16 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        setWillNotDraw(false);
+        //setWillNotDraw(false);
         coffeeGame = new CoffeeGame(context, getWidth(),getHeight());
         coffeeGame.startSoundtrack();
+        (new CoffeeThread(context, this, coffeeGame)).start();
     }
 
     @Override
-    public void onDraw(Canvas canvas) {
-        //System.out.println("ondraw");
-        canvas.drawColor(Color.CYAN);
-        coffeeGame.drawBG(this, canvas);
-        coffeeGame.drawArm(canvas);
-        coffeeGame.drawHand(canvas);
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+        coffeeGame.draw(this, canvas);
     }
 
     @Override
@@ -54,6 +52,7 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceDestroyed(SurfaceHolder holder) {
         coffeeGame.stopAllSoundtrack(); //important to stop playing soundtrack after
                                         //user exits
+        coffeeGame.setGameIsOver();
         System.out.println("Bye");
     }
 
@@ -63,9 +62,10 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
         if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE){
             //System.out.println("action down");
             coffeeGame.setHandPoint(Math.round(event.getX()),Math.round(event.getY()));
-            //return false;
             coffeeGame.updateArm();
-            invalidate();
+            //coffeeGame.updateArm();
+            //return false;
+            //invalidate();
         }
         return true;
     }
