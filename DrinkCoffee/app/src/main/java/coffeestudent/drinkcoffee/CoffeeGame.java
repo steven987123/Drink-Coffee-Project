@@ -26,11 +26,12 @@ public class CoffeeGame {
     private int [] point;
     private CoffeeSounds coffeeSounds;
     private int coffeeSteamCounter=0;
+    private Bitmap backgroundImage;
 
     private boolean gameIsRunning = true;
 
 
-    public CoffeeGame(Context context, int screenwidth, int screenheight){
+    public CoffeeGame(Context context, CoffeeView view, int screenwidth, int screenheight){
         SCREENWIDTH = screenwidth;
         SCREENHEIGHT = screenheight;
         upperArm = new UpperArm(screenwidth*8/10,screenheight*6/10,screenwidth/2,screenheight*8/10);
@@ -43,6 +44,7 @@ public class CoffeeGame {
         Arm.setElbow(upperArm,forearm);
         point = new int [2];
         coffeeSounds = new CoffeeSounds(context);
+        backgroundImage = BitmapFactory.decodeResource(view.getResources(), R.drawable.cubilebg);
     }
 
     //get the point where the user touches
@@ -78,6 +80,8 @@ public class CoffeeGame {
     }
 
     public void drawBG(SurfaceView view, Canvas canvas){
+        Bitmap bitmap = null;
+        canvas.drawBitmap(backgroundImage, -backgroundImage.getWidth()/3, -backgroundImage.getHeight()/2, null);
         //set stroke
         Paint sp = new Paint();
         sp.setStyle(Paint.Style.STROKE);
@@ -108,7 +112,7 @@ public class CoffeeGame {
         //draw coffee machine
         Rect rect = new Rect();
         //rect.set(0,canvas.getHeight()*55/100, canvas.getWidth()*3/10, canvas.getHeight()*95/100);
-        Bitmap bitmap  = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeemachine);
+        bitmap  = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeemachine);
         CoffeeView.setRectWithDefaultRatioWithPixelCoord(rect, bitmap, -70, canvas.getHeight()*5/10,
                 canvas.getWidth()*4/10, canvas.getHeight()*44/100);
         canvas.drawBitmap(bitmap, null, rect, null);

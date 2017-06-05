@@ -32,7 +32,7 @@ public class CoffeeView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         //setWillNotDraw(false);
-        coffeeGame = new CoffeeGame(context, getWidth(),getHeight());
+        coffeeGame = new CoffeeGame(context, this, getWidth(),getHeight());
         coffeeGame.startSoundtrack();
         (new CoffeeThread(context, this, coffeeGame)).start();
     }
