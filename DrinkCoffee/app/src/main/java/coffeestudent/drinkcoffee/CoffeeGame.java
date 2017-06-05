@@ -25,6 +25,7 @@ public class CoffeeGame {
     private final Forearm forearm;
     private int [] point;
     private CoffeeSounds coffeeSounds;
+    private int coffeeSteamCounter=0;
 
     private boolean gameIsRunning = true;
 
@@ -137,6 +138,8 @@ public class CoffeeGame {
         int coordx = forearm.getJoint2()[0] - canvas.getWidth()/5;
         int coordy = forearm.getJoint2()[1] - canvas.getHeight()/10;
         Rect rect = new Rect();
+
+        //rotate coffee cup based on x coord
         CoffeeView.setRectWithDefaultRatioWithPixelCoord(rect, bitmap, coordx, coordy,
                 canvas.getWidth()/5, canvas.getHeight()/5);
         float angle = (float) (Math.pow(1.0*(coordx-1.0/canvas.getWidth()*10),3)/
@@ -146,6 +149,43 @@ public class CoffeeGame {
         canvas.drawBitmap(bitmap, null, rect, null);
         canvas.restore();
 
+        //draw coffee steam
+        rect.set(rect.left+(int)angle, rect.top - canvas.getHeight()*3/10 , rect.right+(int)angle,rect.top- canvas.getHeight()/40);
+        switch(coffeeSteamCounter){
+            case(0):
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam00);
+                break;
+            case(1):
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam01);
+                break;
+            case(2):
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam02);
+                break;
+            case(3):
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam03);
+                break;
+            case(4):
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam04);
+                break;
+            case(5):
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam05);
+                break;
+            case(6):
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam06);
+                break;
+            case(7):
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam07);
+                break;
+            default:
+                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam08);
+                coffeeSteamCounter = 0;
+                break;
+
+        }
+        coffeeSteamCounter++;
+        Paint p = new Paint();
+        p.setAlpha(70);
+        canvas.drawBitmap(bitmap, null, rect, p);
     }
 
     public void startSoundtrack(){
