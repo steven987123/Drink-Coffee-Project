@@ -26,7 +26,10 @@ public class CoffeeGame {
     private int [] point;
     private CoffeeSounds coffeeSounds;
     private int coffeeSteamCounter=0;
-    private Bitmap backgroundImage;
+    private Bitmap backgroundImage, coffeeMachineImage, coffeeCupImage;
+    private Bitmap [] steamBitmaps;
+    public final HealthBar healthBar;
+
 
     private boolean gameIsRunning = true;
 
@@ -45,6 +48,23 @@ public class CoffeeGame {
         point = new int [2];
         coffeeSounds = new CoffeeSounds(context);
         backgroundImage = BitmapFactory.decodeResource(view.getResources(), R.drawable.cubilebg);
+        coffeeMachineImage = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeemachine);
+        coffeeCupImage = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeecup);
+        setSteamImageList(view);
+        healthBar = new HealthBar();
+    }
+
+    private void setSteamImageList(CoffeeView view){
+        steamBitmaps = new Bitmap [9];
+        steamBitmaps[0] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam00);
+        steamBitmaps[1] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam01);
+        steamBitmaps[2] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam02);
+        steamBitmaps[3] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam03);
+        steamBitmaps[4] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam04);
+        steamBitmaps[5] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam05);
+        steamBitmaps[6] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam06);
+        steamBitmaps[7] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam07);
+        steamBitmaps[8] = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam08);
     }
 
     //get the point where the user touches
@@ -59,6 +79,24 @@ public class CoffeeGame {
                 forearm.setJoint2(point[0], point[1]);
                 Arm.setElbow(upperArm, forearm);
             }
+        }
+    }
+
+    public void updateGame(Canvas canvas){
+        healthBar.decreaseHealthPts();
+        //check if coffee cup is near mouth
+        int x = forearm.getJoint2()[0];
+        int y = forearm.getJoint2()[1];
+        if (x > canvas.getWidth()*63/100 && x <= canvas.getWidth()*65/100 &&
+                y > canvas.getHeight()*53/100 && y <= canvas.getHeight()*58/100){
+            healthBar.increaseHealthPts(5);
+            coffeeSounds.playGulpEffect();
+        }
+
+        //check if cpu is at coffee machine
+        else if (x > canvas.getWidth()*3/10 && x <= canvas.getWidth()*4/10 &&
+                y > canvas.getHeight()*7/10 && y <= canvas.getHeight()*8/10){
+            coffeeSounds.playPourEffect();
         }
     }
 
@@ -77,6 +115,7 @@ public class CoffeeGame {
                 drawHand(canvas);
             }
         }
+        healthBar.drawHealthBar(canvas);
     }
 
     public void drawBG(SurfaceView view, Canvas canvas){
@@ -112,10 +151,9 @@ public class CoffeeGame {
         //draw coffee machine
         Rect rect = new Rect();
         //rect.set(0,canvas.getHeight()*55/100, canvas.getWidth()*3/10, canvas.getHeight()*95/100);
-        bitmap  = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeemachine);
-        CoffeeView.setRectWithDefaultRatioWithPixelCoord(rect, bitmap, -70, canvas.getHeight()*5/10,
+        CoffeeView.setRectWithDefaultRatioWithPixelCoord(rect, coffeeMachineImage, -70, canvas.getHeight()*5/10,
                 canvas.getWidth()*4/10, canvas.getHeight()*44/100);
-        canvas.drawBitmap(bitmap, null, rect, null);
+        canvas.drawBitmap(coffeeMachineImage, null, rect, null);
 
         //draw coffee table
         rect.set(0, rect.bottom, canvas.getWidth()*3/10, canvas.getHeight());
@@ -138,7 +176,7 @@ public class CoffeeGame {
     }
 
     public void drawCoffeeCup(CoffeeView view, Canvas canvas){
-        Bitmap bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeecup);
+        Bitmap bitmap = coffeeCupImage;
         int coordx = forearm.getJoint2()[0] - canvas.getWidth()/5;
         int coordy = forearm.getJoint2()[1] - canvas.getHeight()/10;
         Rect rect = new Rect();
@@ -155,36 +193,12 @@ public class CoffeeGame {
 
         //draw coffee steam
         rect.set(rect.left+(int)angle, rect.top - canvas.getHeight()*3/10 , rect.right+(int)angle,rect.top- canvas.getHeight()/40);
-        switch(coffeeSteamCounter){
-            case(0):
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam00);
-                break;
-            case(1):
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam01);
-                break;
-            case(2):
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam02);
-                break;
-            case(3):
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam03);
-                break;
-            case(4):
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam04);
-                break;
-            case(5):
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam05);
-                break;
-            case(6):
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam06);
-                break;
-            case(7):
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam07);
-                break;
-            default:
-                bitmap = BitmapFactory.decodeResource(view.getResources(), R.drawable.coffeesteam08);
-                coffeeSteamCounter = 0;
-                break;
 
+        if (coffeeSteamCounter >= 0 && coffeeSteamCounter < 8)
+            bitmap = steamBitmaps[coffeeSteamCounter];
+        else{
+            bitmap = steamBitmaps[8];
+            coffeeSteamCounter = 0;
         }
         coffeeSteamCounter++;
         Paint p = new Paint();

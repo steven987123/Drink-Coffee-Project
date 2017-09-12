@@ -27,6 +27,7 @@ public class CoffeeThread extends Thread {
             holder = coffeeView.getHolder();
             canvas = holder.lockCanvas();
             if (canvas != null){
+                coffeeGame.updateGame(canvas);
                 coffeeView.draw(canvas);
                 holder.unlockCanvasAndPost(canvas);
             }
